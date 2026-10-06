@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "deptrac/deptrac": "^4.6"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "rm -rf vendor/phpstan/phpstan/turbo-ext",
+            "rm -rf vendor/jetbrains/phpstorm-stubs/tests"
+        ],
+        "post-update-cmd": [
+            "rm -rf vendor/phpstan/phpstan/turbo-ext",
+            "rm -rf vendor/jetbrains/phpstorm-stubs/tests"
+        ]
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "require-dev": {
+        "rector/rector": "^2.4"
+    },
+    "scripts": {
+        "post-install-cmd": "rm -rf vendor/phpstan/phpstan/turbo-ext",
+        "post-update-cmd": "rm -rf vendor/phpstan/phpstan/turbo-ext"
+    }
+}

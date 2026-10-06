@@ -1,0 +1,124 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Deptrac\Deptrac\Supportive\Console;
+
+use Deptrac\Deptrac\Supportive\DependencyInjection\Exception\CannotLoadConfiguration;
+use Deptrac\Deptrac\Supportive\DependencyInjection\ServiceContainerBuilder;
+use RuntimeException;
+use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
+
+use function getcwd;
+use function in_array;
+
+final class Application extends BaseApplication
+{
+    public function __construct()
+    {
+        parent::__construct('deptrac', DeptracVersion::get());
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function getDefaultInputDefinition(): InputDefinition
+    {
+        $definition = parent::getDefaultInputDefinition();
+
+        $definition->addOptions([
+            new InputOption(
+                '--help',
+                '-h',
+                InputOption::VALUE_NONE,
+                'Display help for the given command. When no command is given display help for the <info>analyse</info> command'
+            ),
+            new InputOption(
+                '--no-cache',
+                null,
+                InputOption::VALUE_NONE,
+                'Disable caching mechanisms (wins over --cache-file)'
+            ),
+            new InputOption(
+                '--clear-cache',
+                null,
+                InputOption::VALUE_NONE,
+                'Clears cache file before run'
+            ),
+            new InputOption(
+                '--cache-file',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Location where cache file will be stored',
+                null
+            ),
+            new InputOption(
+                '--config-file',
+                '-c',
+                InputOption::VALUE_REQUIRED,
+                'Location of Deptrac config. Auto-detects deptrac.php or deptrac.yaml in the current directory',
+                null
+            ),
+        ]);
+
+        return $definition;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function doRun(InputInterface $input, OutputInterface $output): int
+    {
+        if (false === ($currentWorkingDirectory = getcwd())) {
+            throw CannotGetCurrentWorkingDirectoryException::cannotGetCWD();
+        }
+
+        try {
+            $input->bind($this->getDefinition());
+        } catch (ExceptionInterface) {
+            // Errors must be ignored, full binding/validation happens later when the command is known.
+        }
+
+        if (null === $input->getArgument('command') && true === $input->getOption('version')) {
+            return parent::doRun($input, $output);
+        }
+
+        /** @var ?string $cache */
+        $cache = $input->getParameterOption('--cache-file', null);
+
+        $factory = new ServiceContainerBuilder($currentWorkingDirectory);
+
+        $noCache = $input->hasParameterOption('--no-cache', true);
+
+        try {
+            if (!in_array($input->getArgument('command'), ['init', 'list', 'help', 'completion'], true)) {
+                $config = (new ConfigFileResolver($currentWorkingDirectory))->resolve($input);
+                $factory = $factory->withConfig($config);
+            }
+
+            $container = $factory->build($noCache ? false : $cache, $input->hasParameterOption('--clear-cache', true));
+            $commandLoader = $container->get('console.command_loader');
+            if (!$commandLoader instanceof CommandLoaderInterface) {
+                throw new RuntimeException('CommandLoader not initialized. Commands can not be registered.');
+            }
+            $this->setCommandLoader($commandLoader);
+            $this->setDefaultCommand('analyse');
+        } catch (CannotLoadConfiguration $e) {
+            if (false === $input->hasParameterOption(['--help', '-h'], true)) {
+                throw $e;
+            }
+
+            $this->setDefaultCommand('help');
+        }
+
+        return parent::doRun($input, $output);
+    }
+}
