@@ -1,0 +1,7 @@
+alias s='php tools/php-cs-fixer fix --dry-run --diff'
+alias f='php tools/php-cs-fixer fix'
+alias a='php tools/phpstan analyse'
+alias d='php tools/deptrac analyse'
+alias t='php tools/phpunit'
+alias m='php tools/infection'
+alias r='php tools/rector'
