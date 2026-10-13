@@ -27,6 +27,9 @@ ENV XDEBUG_MODE=coverage
 
 WORKDIR /app
 
+COPY tools/container-aliases.bash /etc/eventflow-aliases.bash
+RUN printf '%s\n' '. /etc/eventflow-aliases.bash' >> /etc/bash.bashrc
+
 # The project is mounted into /app at run time. We make sure the autoloader is
 # generated (this needs no network, as all tools are committed PHARs) and then
 # run the requested composer script. Without arguments the complete quality

@@ -1,0 +1,11 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: eventflow-ci
+    working_dir: /app
+    volumes:
+      - .:/app
+    entrypoint: []
+    command: ["sleep", "infinity"]

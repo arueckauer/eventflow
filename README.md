@@ -83,6 +83,43 @@ podman run --rm -v "$PWD":/app:Z eventflow-ci tests
 
 Beachte, dass `refactoring` die Dateien in deiner eingebundenen Arbeitskopie verändert.
 
+### Interaktive Werkzeug-Shell mit Docker Compose
+
+Mit `compose.yaml` kannst du einen dauerhaften Container starten und darin eine Bash öffnen:
+
+```bash
+docker compose up -d --build php
+docker compose exec --user "$(id -u):$(id -g)" php bash
+```
+
+Du startest im Projektverzeichnis `/app`. Die Benutzerzuordnung verhindert, dass die Werkzeuge neue Dateien mit Root-Eigentümer in deiner Arbeitskopie erzeugen. Die folgenden Aliase werden beim Image-Build eingerichtet und in jeder interaktiven Bash automatisch geladen:
+
+| Alias | Kommando                                      | Zweck                     |
+| ----- | --------------------------------------------- | ------------------------- |
+| `s`   | `php tools/php-cs-fixer fix --dry-run --diff` | Coding Standard prüfen    |
+| `f`   | `php tools/php-cs-fixer fix`                  | Formatierung korrigieren  |
+| `a`   | `php tools/phpstan analyse`                   | Statische Analyse         |
+| `d`   | `php tools/deptrac analyse --no-progress`     | Architektur prüfen        |
+| `t`   | `php tools/phpunit --compact`                 | Tests ausführen           |
+| `m`   | `php tools/infection`                         | Mutation Testing          |
+| `r`   | `php tools/rector --dry-run`                  | Refactorings nur anzeigen |
+
+Zusätzliche Argumente lassen sich anhängen, etwa `t --filter MoneyTest`. `f` verändert Quelldateien; `s` und `r` zeigen Änderungen nur an. Verwende `bash`, nicht `sh`, damit die Aliase geladen werden. Das Terminal ermöglicht die automatische Farberkennung der Werkzeuge.
+
+Compose überspringt den Image-Entrypoint. Erzeuge deshalb vor der ersten Prüfung beziehungsweise nach Änderungen an den Composer-Abhängigkeiten den Autoloader:
+
+```bash
+php tools/composer install --no-interaction --no-progress
+```
+
+Das komplette Quality Gate führst du in dieser Shell weiterhin mit Composer aus:
+
+```bash
+php tools/composer --ansi run-script --timeout=0 ci
+```
+
+Mit `exit` verlässt du die Shell; der Container läuft weiter. Nach Änderungen an den Aliasen in `tools/container-aliases.bash` baust du das Image erneut mit `docker compose up -d --build php`.
+
 ### Das Quality Gate
 
 `composer ci` führt alle Feedback-Schleifen nacheinander aus.
