@@ -16,7 +16,8 @@
             "@static-analysis",
             "@architecture",
             "@tests",
-            "@mutation-testing"
+            "@mutation-testing",
+            "@rector-check"
         ],
         "refactoring": [
             "@php tools/rector",
@@ -26,7 +27,8 @@
         "static-analysis": "@php tools/phpstan analyse",
         "architecture": "@php tools/deptrac analyse --no-progress",
         "tests": "@php tools/phpunit --compact",
-        "mutation-testing": "@php tools/infection"
+        "mutation-testing": "@php tools/infection",
+        "rector-check": "@php tools/rector --dry-run"
     },
     "scripts-descriptions": {
         "ci": "Runs the complete quality gate (the same checks the CI pipeline runs)",
@@ -35,7 +37,8 @@
         "static-analysis": "Runs static analysis with PHPStan",
         "architecture": "Verifies the architecture rules with Deptrac",
         "tests": "Runs the test suite with PHPUnit",
-        "mutation-testing": "Runs mutation testing with Infection"
+        "mutation-testing": "Runs mutation testing with Infection",
+        "rector-check": "Checks for applicable refactorings with Rector without changing files"
     },
     "config": {
         "platform": {
