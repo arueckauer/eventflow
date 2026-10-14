@@ -122,7 +122,7 @@ Mit `exit` verlässt du die Shell; der Container läuft weiter. Nach Änderungen
 
 ### Das Quality Gate
 
-`composer ci` führt alle Feedback-Schleifen nacheinander aus.
+`composer ci` führt alle sechs Feedback-Schleifen nacheinander aus.
 Jede fängt eine andere Klasse von Fehlern, und jede läuft auch in der CI-Pipeline (`.github/workflows/ci.yaml`):
 
 | Kommando                    | Werkzeug     | Findet                                                             |
@@ -132,6 +132,7 @@ Jede fängt eine andere Klasse von Fehlern, und jede läuft auch in der CI-Pipel
 | `composer architecture`     | Deptrac      | Verbotene Abhängigkeiten zwischen den Schichten                    |
 | `composer tests`            | PHPUnit      | Falsches Verhalten                                                 |
 | `composer mutation-testing` | Infection    | Tests, die zu schwach sind, um eine Verhaltensänderung zu bemerken |
+| `composer rector-check`      | Rector       | Anwendbare Refactorings (Dry Run, ohne Dateien zu ändern)           |
 
 Mit den Kommandos oben kannst du jede Stufe auch einzeln ausführen.
 
