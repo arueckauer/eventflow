@@ -27,7 +27,10 @@ final class EventTest extends TestCase
     }
 
     /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
      */
     public function testCanReserveFreeSeat(): void
     {
@@ -39,7 +42,10 @@ final class EventTest extends TestCase
     }
 
     /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
      */
     public function testCannotReserveTakenSeat(): void
     {
@@ -57,7 +63,10 @@ final class EventTest extends TestCase
     }
 
     /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
      */
     public function testCannotReserveAfterEventStart(): void
     {
@@ -71,6 +80,7 @@ final class EventTest extends TestCase
 
     /**
      * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
      * @throws SeatAlreadyTakenException
      */
@@ -85,7 +95,10 @@ final class EventTest extends TestCase
     }
 
     /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
      */
     public function testCancelingAReservationMakesTheReservedSeatAvailableAgain(): void
     {
@@ -104,7 +117,10 @@ final class EventTest extends TestCase
     }
 
     /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
      */
     public function testCannotCancelAfterEventStart(): void
     {
@@ -121,7 +137,10 @@ final class EventTest extends TestCase
     }
 
     /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
      */
     public function testCanRecordReservation(): void
     {
