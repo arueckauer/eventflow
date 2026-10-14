@@ -104,6 +104,32 @@ final class EventTest extends TestCase
      * @throws InvalidSeatNumberException
      * @throws SeatAlreadyTakenException
      */
+    public function testEventAlreadyStartedTakesPrecedenceOverFullCapacity(): void
+    {
+        $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 1);
+
+        $event->reserve(
+            SeatNumber::fromString('A5'),
+            Attendee::named('Andi'),
+            new DateTimeImmutable('2026-11-10 19:00:00'),
+        );
+
+        $this->expectException(EventAlreadyStartedException::class);
+        $this->expectExceptionMessageIs('Reservation only possible before event start.');
+
+        $event->reserve(
+            SeatNumber::fromString('B2'),
+            Attendee::named('Bert'),
+            new DateTimeImmutable('2026-11-10 20:00:00'),
+        );
+    }
+
+    /**
+     * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
+     * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
+     */
     public function testCancelingAReservationMakesTheReservedSeatAvailableAgain(): void
     {
         $this->expectNotToPerformAssertions();

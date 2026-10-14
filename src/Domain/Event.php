@@ -34,12 +34,12 @@ final class Event
      */
     public function reserve(SeatNumber $seatNumber, Attendee $attendee, DateTimeImmutable $now): Reservation
     {
-        if (count($this->reservedSeats) >= $this->capacity) {
-            throw EventFullyBookedException::forReservation();
-        }
-
         if ($now >= $this->startsAt) {
             throw EventAlreadyStartedException::forReservation();
+        }
+
+        if (count($this->reservedSeats) >= $this->capacity) {
+            throw EventFullyBookedException::forReservation();
         }
 
         $key = $seatNumber->asString();
