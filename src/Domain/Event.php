@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Thephpcc\EventFlow\Domain;
 
+use function count;
 use DateTimeImmutable;
 
 /**
@@ -11,7 +12,7 @@ final class Event
     use RecordsDomainEvents;
 
     /**
-     * @var array<string, SeatNumber>
+     * @var array<string, Reservation>
      */
     private array $reservedSeats = [];
 
@@ -28,10 +29,15 @@ final class Event
 
     /**
      * @throws EventAlreadyStartedException
+     * @throws EventFullyBookedException
      * @throws SeatAlreadyTakenException
      */
-    public function reserve(SeatNumber $seatNumber, DateTimeImmutable $now): void
+    public function reserve(SeatNumber $seatNumber, Attendee $attendee, DateTimeImmutable $now): Reservation
     {
+        if (count($this->reservedSeats) >= $this->capacity) {
+            throw EventFullyBookedException::forReservation();
+        }
+
         if ($now >= $this->startsAt) {
             throw EventAlreadyStartedException::forReservation();
         }
@@ -42,9 +48,12 @@ final class Event
             throw SeatAlreadyTakenException::from($seatNumber);
         }
 
-        $this->reservedSeats[$key] = $seatNumber;
+        $reservation               = new Reservation($seatNumber, $attendee);
+        $this->reservedSeats[$key] = $reservation;
 
         $this->recordThat(new SeatReserved($seatNumber, $now));
+
+        return $reservation;
     }
 
     /**

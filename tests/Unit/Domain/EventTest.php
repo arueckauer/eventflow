@@ -5,8 +5,11 @@ use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Attendee::class)]
 #[CoversClass(Event::class)]
 #[CoversClass(EventAlreadyStartedException::class)]
+#[CoversClass(EventFullyBookedException::class)]
+#[CoversClass(Reservation::class)]
 #[CoversClass(SeatAlreadyTakenException::class)]
 #[CoversClass(SeatNumber::class)]
 #[CoversClass(SeatReserved::class)]
@@ -32,7 +35,7 @@ final class EventTest extends TestCase
 
         $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 20);
 
-        $event->reserve(SeatNumber::fromString('A5'), new DateTimeImmutable);
+        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable);
     }
 
     /**
@@ -43,13 +46,14 @@ final class EventTest extends TestCase
         $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 20);
 
         $seatNumber = SeatNumber::fromString('A5');
+        $attendee   = Attendee::named('Andi');
 
-        $event->reserve($seatNumber, new DateTimeImmutable);
+        $event->reserve($seatNumber, $attendee, new DateTimeImmutable);
 
         $this->expectException(SeatAlreadyTakenException::class);
         $this->expectExceptionMessageIs('Seat "A5" is already taken.');
 
-        $event->reserve($seatNumber, new DateTimeImmutable);
+        $event->reserve($seatNumber, $attendee, new DateTimeImmutable);
     }
 
     /**
@@ -59,12 +63,25 @@ final class EventTest extends TestCase
     {
         $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 20);
 
-        $seatNumber = SeatNumber::fromString('A5');
-
         $this->expectException(EventAlreadyStartedException::class);
         $this->expectExceptionMessageIs('Reservation only possible before event start.');
 
-        $event->reserve($seatNumber, new DateTimeImmutable('2026-11-10 20:00:00'));
+        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable('2026-11-10 20:00:00'));
+    }
+
+    /**
+     * @throws EventAlreadyStartedException
+     * @throws InvalidSeatNumberException
+     * @throws SeatAlreadyTakenException
+     */
+    public function testCannotReserveFullBookedEvent(): void
+    {
+        $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 0);
+
+        $this->expectException(EventFullyBookedException::class);
+        $this->expectExceptionMessageIs('Event is already fully booked.');
+
+        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable('2026-11-10 20:00:00'));
     }
 
     /**
@@ -77,12 +94,13 @@ final class EventTest extends TestCase
         $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 20);
 
         $seatNumber = SeatNumber::fromString('A5');
+        $attendee   = Attendee::named('Andi');
 
-        $event->reserve($seatNumber, new DateTimeImmutable);
+        $event->reserve($seatNumber, $attendee, new DateTimeImmutable);
 
         $event->cancelReservation($seatNumber, new DateTimeImmutable);
 
-        $event->reserve($seatNumber, new DateTimeImmutable);
+        $event->reserve($seatNumber, $attendee, new DateTimeImmutable);
     }
 
     /**
@@ -94,7 +112,7 @@ final class EventTest extends TestCase
 
         $seatNumber = SeatNumber::fromString('A5');
 
-        $event->reserve($seatNumber, new DateTimeImmutable);
+        $event->reserve($seatNumber, Attendee::named('Andi'), new DateTimeImmutable);
 
         $this->expectException(EventAlreadyStartedException::class);
         $this->expectExceptionMessageIs('Cancellation only possible before event start.');
@@ -109,7 +127,7 @@ final class EventTest extends TestCase
     {
         $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 20);
 
-        $event->reserve(SeatNumber::fromString('A5'), new DateTimeImmutable);
+        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable);
 
         $recordedEvents = $event->releaseRecordedEvents();
 
