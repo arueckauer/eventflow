@@ -175,3 +175,16 @@ tests/
 Sie sind die Vorlage für den Stil, in dem alles andere in diesem Projekt geschrieben wird:
 unveränderliche Value Objects, benannte Konstruktoren, verhaltensorientierte Tests und 100 % Mutation Coverage.
 Lies sie zuerst.
+
+### Geldbeträge
+
+`Money::from(1234, 'EUR')` erzeugt einen unveränderlichen Betrag von 1234 Cent.
+`amount()` liefert die Cent als Integer, `currency()` das Value Object `Currency`.
+`Currency::fromString()` unterstützt ausschließlich die Codes `EUR` und `GBP`;
+andere Codes führen zu `UnknownCurrencyException`.
+
+Negative Startbeträge führen zu `InvalidMoneyAmountException`. `add()` und
+`subtract()` liefern neue Objekte, wobei negative Ergebnisse für Erstattungen
+erlaubt sind. Unterschiedliche Währungen führen zu `CurrencyMismatchException`,
+Integer-Überläufe zu `MoneyOverflowException`. `equals()` vergleicht Betrag und
+Währung.
