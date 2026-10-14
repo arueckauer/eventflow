@@ -5,8 +5,8 @@ use Exception as PhpException;
 
 final class MoneyOverflowException extends PhpException implements Exception
 {
-    public function __construct()
+    public static function integerRangeExceeded(): self
     {
-        parent::__construct('The money amount exceeds the integer range');
+        return new self('The money amount exceeds the integer range');
     }
 }

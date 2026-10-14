@@ -74,7 +74,7 @@ final readonly class Money
     private function withAmount(float|int $amount): self
     {
         if (!is_int($amount)) {
-            throw new MoneyOverflowException;
+            throw MoneyOverflowException::integerRangeExceeded();
         }
 
         return new self($amount, $this->currency);
