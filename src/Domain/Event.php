@@ -51,7 +51,7 @@ final class Event
         $reservation               = new Reservation($seatNumber, $attendee);
         $this->reservedSeats[$key] = $reservation;
 
-        $this->recordThat(new SeatReserved($seatNumber, $now));
+        $this->recordThat(new SeatReserved($seatNumber, $attendee, $now));
 
         return $reservation;
     }

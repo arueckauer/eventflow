@@ -176,11 +176,19 @@ final class EventTest extends TestCase
     {
         $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 20);
 
-        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable);
+        $seatNumber = SeatNumber::fromString('A5');
+        $attendee   = Attendee::named('Andi');
+
+        $event->reserve($seatNumber, $attendee, new DateTimeImmutable);
 
         $recordedEvents = $event->releaseRecordedEvents();
 
         $this->assertCount(1, $recordedEvents);
-        $this->assertInstanceOf(SeatReserved::class, $recordedEvents[0] ?? null);
+
+        $seatReserved = $recordedEvents[0] ?? null;
+
+        $this->assertInstanceOf(SeatReserved::class, $seatReserved);
+        $this->assertSame($seatNumber, $seatReserved->seatNumber);
+        $this->assertSame($attendee, $seatReserved->attendee);
     }
 }

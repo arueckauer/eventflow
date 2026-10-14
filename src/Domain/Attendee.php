@@ -5,6 +5,10 @@ final readonly class Attendee
 {
     public static function named(string $name): self
     {
+        if ($name === '') {
+            throw NameMustNotBeEmptyException::create();
+        }
+
         return new self($name);
     }
 
