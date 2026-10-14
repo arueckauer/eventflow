@@ -86,12 +86,16 @@ final class EventTest extends TestCase
      */
     public function testCannotReserveFullBookedEvent(): void
     {
-        $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 0);
+        $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 3);
+
+        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable('2026-10-14 11:41:05'));
+        $event->reserve(SeatNumber::fromString('B2'), Attendee::named('Bert'), new DateTimeImmutable('2026-10-14 11:42:02'));
+        $event->reserve(SeatNumber::fromString('C1'), Attendee::named('Carl'), new DateTimeImmutable('2026-10-14 11:43:01'));
 
         $this->expectException(EventFullyBookedException::class);
         $this->expectExceptionMessageIs('Event is already fully booked.');
 
-        $event->reserve(SeatNumber::fromString('A5'), Attendee::named('Andi'), new DateTimeImmutable('2026-11-10 20:00:00'));
+        $event->reserve(SeatNumber::fromString('D9'), Attendee::named('Dirk'), new DateTimeImmutable('2026-10-14 11:44:09'));
     }
 
     /**
