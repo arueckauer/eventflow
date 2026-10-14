@@ -18,6 +18,10 @@ final class Event
 
     public static function create(DateTimeImmutable $startsAt, int $capacity): self
     {
+        if ($capacity < 0) {
+            throw NegativeCapacityException::fromCapacity($capacity);
+        }
+
         return new self($startsAt, $capacity);
     }
 

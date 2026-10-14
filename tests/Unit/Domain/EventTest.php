@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Event::class)]
 #[CoversClass(EventAlreadyStartedException::class)]
 #[CoversClass(EventFullyBookedException::class)]
+#[CoversClass(NegativeCapacityException::class)]
 #[CoversClass(Reservation::class)]
 #[CoversClass(SeatAlreadyTakenException::class)]
 #[CoversClass(SeatNumber::class)]
@@ -24,6 +25,21 @@ final class EventTest extends TestCase
 
         $this->assertSame($startsAt, $event->startsAt);
         $this->assertSame($capacity, $event->capacity);
+    }
+
+    public function testCannotCreateEventWithNegativeCapacity(): void
+    {
+        $this->expectException(NegativeCapacityException::class);
+        $this->expectExceptionMessageIs('Capacity must be a non-negative value, -1 given.');
+
+        Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), -1);
+    }
+
+    public function testCanCreateEventWithZeroCapacity(): void
+    {
+        $event = Event::create(new DateTimeImmutable('2026-11-10 20:00:00'), 0);
+
+        $this->assertSame(0, $event->capacity);
     }
 
     /**
