@@ -1,9 +1,7 @@
 # Working on EventFlow
 
 These are the standing rules for any coding agent in this repository. The
-task itself comes with each prompt; these rules apply to every task. If your
-agent reads a different file (Claude Code, for instance, reads `CLAUDE.md`),
-point that file to this one.
+task itself comes with each prompt; these rules apply to every task.
 
 ## The tests are the specification
 
